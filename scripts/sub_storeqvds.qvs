@@ -1,0 +1,12 @@
+SUB storeqvds
+
+    FOR i = 0 to NoOfTables()-1
+
+        LET vTableName = TableName($(i));
+
+        STORE [$(vTableName)] INTO [lib://main/silver/$(vTableName).qvd] (qvd);
+
+        DROP TABLE [$(vTableName)];
+    NEXT i
+
+END SUB

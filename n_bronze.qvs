@@ -1,0 +1,66 @@
+/*
+	Extract Script
+
+	Changelog:
+	- 25.7.25 - First edit, initial load of xls data
+*/
+
+//Flat file extraction location
+SET vNorthwindUnclean = 'lib://main/Qlik Northwind_Uncleaned.xls';
+
+//SQL or othe SAP source
+SET vSQL = '';
+SET vSAP = '';
+
+//Set the extraction source
+LET vExtractSource = '$(vNorthwindUnclean)';
+
+//List the tables you want to extract
+[ExtractTablesList]:
+LOAD * INLINE [
+TableNames
+Categories$
+Customers$
+Employees$
+Orders Details$
+Orders$
+Product$
+Shippers$
+Suppliers$
+]
+;
+
+//Set a cutoff date to start the extract from.
+SET vMinDate = 2018;
+
+//Loop Through List of tables and store as QVD with no changes.
+FOR EACH i in FieldValueList('TableNames')
+
+    //Excel Extraction Loop
+    [$(i)]:
+    LOAD
+        *
+    FROM [$(vExtractSource)]
+    (biff, embedded labels, table is [$(i)]);
+    //WHERE YEAR(VFDAT) > $(vMinDate) - not in use ignore this
+    ;
+
+    Call rcount;
+
+    [MetaDataTable]
+    LOAD
+      $(i)
+    , $(vRowCount)
+    AUTOGENERATE (1)
+    ;
+
+    STORE * FROM [$(i)] INTO [lib://main/bronze/$(i).qvd] (qvd)
+    ;
+
+    DROP TABLE [$(i)];
+
+
+NEXT i
+
+//Drop Extract Tables List
+//DROP TABLE ExtractTablesList;

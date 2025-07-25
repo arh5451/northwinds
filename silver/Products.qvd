@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+ <QvdTableHeader>
+   <QvBuildNo>50689</QvBuildNo>
+   <CreatorDoc>C:\Users\ahugh\OneDrive\Documents\Qlik\Sense\Apps\northwinds.qvf</CreatorDoc>
+   <CreateUtcTime>2025-07-25 17:57:05</CreateUtcTime>
+   <SourceCreateUtcTime></SourceCreateUtcTime>
+   <SourceFileUtcTime></SourceFileUtcTime>
+   <SourceFileSize>-1</SourceFileSize>
+   <StaleUtcTime></StaleUtcTime>
+   <TableName>Products</TableName>
+   <Fields>
+     <QvdFieldHeader>
+       <FieldName>%ProductID</FieldName>
+       <BitOffset>0</BitOffset>
+       <BitWidth>8</BitWidth>
+       <Bias>0</Bias>
+       <NumberFormat>
+         <Type>REAL</Type>
+         <nDec>14</nDec>
+         <UseThou>1</UseThou>
+         <Fmt>##############</Fmt>
+         <Dec>.</Dec>
+         <Thou></Thou>
+       </NumberFormat>
+       <NoOfSymbols>77</NoOfSymbols>
+       <Offset>0</Offset>
+       <Length>385</Length>
+       <Comment></Comment>
+       <Tags>
+         <String>$numeric</String>
+         <String>$integer</String>
+         <String>$key</String>
+       </Tags>
+     </QvdFieldHeader>
+     <QvdFieldHeader>
+       <FieldName>%SupplierID</FieldName>
+       <BitOffset>8</BitOffset>
+       <BitWidth>5</BitWidth>
+       <Bias>0</Bias>
+       <NumberFormat>
+         <Type>REAL</Type>
+         <nDec>14</nDec>
+         <UseThou>1</UseThou>
+         <Fmt>##############</Fmt>
+         <Dec>.</Dec>
+         <Thou></Thou>
+       </NumberFormat>
+       <NoOfSymbols>29</NoOfSymbols>
+       <Offset>385</Offset>
+       <Length>145</Length>
+       <Comment></Comment>
+       <Tags>
+         <String>$numeric</String>
+         <String>$integer</String>
+         <String>$key</String>
+       </Tags>
+     </QvdFieldHeader>
+     <QvdFieldHeader>
+       <FieldName>ProductName</FieldName>
+       <BitOffset>19</BitOffset>
+       <BitWidth>7</BitWidth>
+       <Bias>0</Bias>
+       <NumberFormat>
+         <Type>REAL</Type>
+         <nDec>14</nDec>
+         <UseThou>1</UseThou>
+         <Fmt>##############</Fmt>
+         <Dec>.</Dec>
+         <Thou></Thou>
+       </NumberFormat>
+       <NoOfSymbols>77</NoOfSymbols>
+       <Offset>530</Offset>
+       <Length>1440</Length>
+       <Comment></Comment>
+       <Tags>
+         <String>$text</String>
+       </Tags>
+     </QvdFieldHeader>
+     <QvdFieldHeader>
+       <FieldName>Product CategoryID</FieldName>
+       <BitOffset>44</BitOffset>
+       <BitWidth>4</BitWidth>
+       <Bias>0</Bias>
+       <NumberFormat>
+         <Type>REAL</Type>
+         <nDec>14</nDec>
+         <UseThou>1</UseThou>
+         <Fmt>##############</Fmt>
+         <Dec>.</Dec>
+         <Thou></Thou>
+       </NumberFormat>
+       <NoOfSymbols>8</NoOfSymbols>
+       <Offset>1970</Offset>
+       <Length>40</Length>
+       <Comment></Comment>
+       <Tags>
+         <String>$numeric</String>
+         <String>$integer</String>
+       </Tags>
+     </QvdFieldHeader>
+     <QvdFieldHeader>
+       <FieldName>QuantityPerUnit</FieldName>
+       <BitOffset>26</BitOffset>
+       <BitWidth>7</BitWidth>
+       <Bias>0</Bias>
+       <NumberFormat>
+         <Type>REAL</Type>
+         <nDec>14</nDec>
+         <UseThou>1</UseThou>
+         <Fmt>##############</Fmt>
+         <Dec>.</Dec>
+         <Thou></Thou>
+       </NumberFormat>
+       <NoOfSymbols>70</NoOfSymbols>
+       <Offset>2010</Offset>
+       <Length>1159</Length>
+       <Comment></Comment>
+       <Tags>
+         <String>$ascii</String>
+         <String>$text</String>
+       </Tags>
+     </QvdFieldHeader>
+     <QvdFieldHeader>
+       <FieldName>Product UnitPrice</FieldName>
+       <BitOffset>13</BitOffset>
+       <BitWidth>6</BitWidth>
+       <Bias>0</Bias>
+       <NumberFormat>
+         <Type>FIX</Type>
+         <nDec>2</nDec>
+         <UseThou>1</UseThou>
+         <Fmt>###0.00</Fmt>
+         <Dec>.</Dec>
+         <Thou></Thou>
+       </NumberFormat>
+       <NoOfSymbols>62</NoOfSymbols>
+       <Offset>3169</Offset>
+       <Length>438</Length>
+       <Comment></Comment>
+       <Tags>
+         <String>$numeric</String>
+       </Tags>
+     </QvdFieldHeader>
+     <QvdFieldHeader>
+       <FieldName>UnitsInStock</FieldName>
+       <BitOffset>33</BitOffset>
+       <BitWidth>7</BitWidth>
+       <Bias>0</Bias>
+       <NumberFormat>
+         <Type>REAL</Type>
+         <nDec>14</nDec>
+         <UseThou>1</UseThou>
+         <Fmt>##############</Fmt>
+         <Dec>.</Dec>
+         <Thou></Thou>
+       </NumberFormat>
+       <NoOfSymbols>51</NoOfSymbols>
+       <Offset>3607</Offset>
+       <Length>255</Length>
+       <Comment></Comment>
+       <Tags>
+         <String>$numeric</String>
+         <String>$integer</String>
+       </Tags>
+     </QvdFieldHeader>
+     <QvdFieldHeader>
+       <FieldName>UnitsOnOrder</FieldName>
+       <BitOffset>40</BitOffset>
+       <BitWidth>4</BitWidth>
+       <Bias>0</Bias>
+       <NumberFormat>
+         <Type>REAL</Type>
+         <nDec>14</nDec>
+         <UseThou>1</UseThou>
+         <Fmt>##############</Fmt>
+         <Dec>.</Dec>
+         <Thou></Thou>
+       </NumberFormat>
+       <NoOfSymbols>10</NoOfSymbols>
+       <Offset>3862</Offset>
+       <Length>50</Length>
+       <Comment></Comment>
+       <Tags>
+         <String>$numeric</String>
+         <String>$integer</String>
+       </Tags>
+     </QvdFieldHeader>
+     <QvdFieldHeader>
+       <FieldName>ReorderLevel</FieldName>
+       <BitOffset>48</BitOffset>
+       <BitWidth>3</BitWidth>
+       <Bias>0</Bias>
+       <NumberFormat>
+         <Type>REAL</Type>
+         <nDec>14</nDec>
+         <UseThou>1</UseThou>
+         <Fmt>##############</Fmt>
+         <Dec>.</Dec>
+         <Thou></Thou>
+       </NumberFormat>
+       <NoOfSymbols>7</NoOfSymbols>
+       <Offset>3912</Offset>
+       <Length>35</Length>
+       <Comment></Comment>
+       <Tags>
+         <String>$numeric</String>
+         <String>$integer</String>
+       </Tags>
+     </QvdFieldHeader>
+     <QvdFieldHeader>
+       <FieldName>Discontinued</FieldName>
+       <BitOffset>55</BitOffset>
+       <BitWidth>1</BitWidth>
+       <Bias>0</Bias>
+       <NumberFormat>
+         <Type>UNKNOWN</Type>
+         <nDec>0</nDec>
+         <UseThou>0</UseThou>
+         <Fmt></Fmt>
+         <Dec></Dec>
+         <Thou></Thou>
+       </NumberFormat>
+       <NoOfSymbols>2</NoOfSymbols>
+       <Offset>3947</Offset>
+       <Length>30</Length>
+       <Comment></Comment>
+       <Tags>
+         <String>$numeric</String>
+         <String>$integer</String>
+       </Tags>
+     </QvdFieldHeader>
+     <QvdFieldHeader>
+       <FieldName>isStockOut</FieldName>
+       <BitOffset>51</BitOffset>
+       <BitWidth>2</BitWidth>
+       <Bias>-2</Bias>
+       <NumberFormat>
+         <Type>UNKNOWN</Type>
+         <nDec>0</nDec>
+         <UseThou>0</UseThou>
+         <Fmt></Fmt>
+         <Dec></Dec>
+         <Thou></Thou>
+       </NumberFormat>
+       <NoOfSymbols>2</NoOfSymbols>
+       <Offset>3977</Offset>
+       <Length>38</Length>
+       <Comment></Comment>
+       <Tags>
+         <String>$numeric</String>
+         <String>$integer</String>
+       </Tags>
+     </QvdFieldHeader>
+     <QvdFieldHeader>
+       <FieldName>isReOrder</FieldName>
+       <BitOffset>53</BitOffset>
+       <BitWidth>2</BitWidth>
+       <Bias>-2</Bias>
+       <NumberFormat>
+         <Type>UNKNOWN</Type>
+         <nDec>0</nDec>
+         <UseThou>0</UseThou>
+         <Fmt></Fmt>
+         <Dec></Dec>
+         <Thou></Thou>
+       </NumberFormat>
+       <NoOfSymbols>2</NoOfSymbols>
+       <Offset>4015</Offset>
+       <Length>41</Length>
+       <Comment></Comment>
+       <Tags>
+         <String>$numeric</String>
+         <String>$integer</String>
+       </Tags>
+     </QvdFieldHeader>
+   </Fields>
+   <Compression></Compression>
+   <RecordByteSize>7</RecordByteSize>
+   <NoOfRecords>77</NoOfRecords>
+   <Offset>4056</Offset>
+   <Length>539</Length>
+   <Lineage></Lineage>
+   <Comment></Comment>
+   <EncryptionInfo></EncryptionInfo>
+   <TableTags></TableTags>
+   <ProfilingData></ProfilingData>
+ </QvdTableHeader>
+                         	   
+                                                                      !   "   #   $   %   &   '   (   )   *   +   ,   -   .   /   0   1   2   3   4   5   6   7   8   9   :   ;   <   =   >   ?   @   A   B   C   D   E   F   G   H   I   J   K   L   M                           	   
+                                                            Chai Chang Aniseed Syrup Chef Anton's Cajun Seasoning Chef Anton's Gumbo Mix Grandma's Boysenberry Spread Uncle Bob's Organic Dried Pears Northwoods Cranberry Sauce Mishi Kobe Niku Ikura Queso Cabrales Queso Manchego La Pastora Konbu Tofu Genen Shouyu Pavlova Alice Mutton Carnarvon Tigers Teatime Chocolate Biscuits Sir Rodney's Marmalade Sir Rodney's Scones Gustaf's Kn√§ckebr√∂d Tunnbr√∂d Guaran√° Fant√°stica NuNuCa Nu√ü-Nougat-Creme Gumb√§r Gummib√§rchen Schoggi Schokolade R√∂ssle Sauerkraut Th√ºringer Rostbratwurst Nord-Ost Matjeshering Gorgonzola Telino Mascarpone Fabioli Geitost Sasquatch Ale Steeleye Stout Inlagd Sill Gravad lax C√¥te de Blaye Chartreuse verte Boston Crab Meat Jack's New England Clam Chowder Singaporean Hokkien Fried Mee Ipoh Coffee Gula Malacca R√∏gede sild Spegesild Zaanse koeken Chocolade Maxilaku Valkoinen suklaa Manjimup Dried Apples Filo Mix Perth Pasties Tourti√®re P√¢t√© chinois Gnocchi di nonna Alice Ravioli Angelo Escargots de Bourgogne Raclette Courdavault Camembert Pierrot Sirop d'√©rable Tarte au sucre Vegie-spread Wimmers gute Semmelkn√∂del Louisiana Fiery Hot Pepper Sauce Louisiana Hot Spiced Okra Laughing Lumberjack Lager Scottish Longbreads Gudbrandsdalsost Outback Lager Fl√∏temysost Mozzarella di Giovanni R√∂d Kaviar Longlife Tofu Rh√∂nbr√§u Klosterbier Lakkalik√∂√∂ri Original Frankfurter gr√ºne So√üe                         10 boxes x 20 bags 24 - 12 oz bottles 12 - 550 ml bottles 48 - 6 oz jars 36 boxes 12 - 8 oz jars 12 - 1 lb pkgs. 12 - 12 oz jars 18 - 500 g pkgs. 12 - 200 ml jars 1 kg pkg. 10 - 500 g pkgs. 2 kg box 40 - 100 g pkgs. 24 - 250 ml bottles 32 - 500 g boxes 20 - 1 kg tins 16 kg pkg. 10 boxes x 12 pieces 30 gift boxes 24 pkgs. x 4 pieces 24 - 500 g pkgs. 12 - 250 g pkgs. 12 - 355 ml cans 20 - 450 g glasses 100 - 250 g bags 100 - 100 g pieces 25 - 825 g cans 50 bags x 30 sausgs. 10 - 200 g glasses 12 - 100 g pkgs 24 - 200 g pkgs. 500 g 24 - 250 g  jars 12 - 500 g pkgs. 12 - 75 cl bottles 750 cc per bottle 24 - 4 oz tins 12 - 12 oz cans 32 - 1 kg pkgs. 16 - 500 g tins 20 - 2 kg bags 1k pkg. 4 - 450 g glasses 10 - 4 oz boxes 10 pkgs. 24 - 50 g pkgs. 12 - 100 g bars 50 - 300 g pkgs. 16 - 2 kg boxes 48 pieces 16 pies 24 boxes x 2 pies 24 - 250 g pkgs. 24 pieces 5 kg pkg. 15 - 300 g rounds 24 - 500 ml bottles 48 pies 15 - 625 g jars 20 bags x 4 pieces 32 - 8 oz bottles 24 - 8 oz jars 10 boxes x 8 pieces 10 kg pkg. 24 - 355 ml bottles 24 - 150 g jars 24 - 0.5 l bottles 500 ml 12 boxes       
+      öôôôôY5@      (   a         &           @7@      /@33333s1@'        @O@ffffff"@Q   	         @   {ÆG·:?@33333ÛE@ÕÃÃÃÃÃF@√ı(\èÚ^@§p=
+◊„9@      )@          @        xp@ffffff2@ÕÃÃÃÃL#@.   33333s3@      #@        Ä)@        @0@5      ffffff@@ÕÃÃÃÃÃ@        Ä3@     Ä*@7   "        Ä<@fffff¶H@     †@@ÕÃÃÃÃ5@   $           Ä5@ffffffA@      @   '         5       x                  V      #   *      (      h   =      L   1      
+   	   p   o      E   {   U         _   $   A   &      s   >   O      q      4      e   }   9           (   F      2   
+   <   P   d      
+                          active    discontinued     available to ship    stock out     stock on hand    reorder required       P y@yaRÅ Ç¢(
+Q¬0 P‚8RA 0Ç	#I$@R
+DQ(S{dY,PRÖa0@T•i4 R≈q8 TÊy<`PÇ@0Ç&äD@RGíH`TgöL `RG†P"a|H©T$pQà≤X&pQ©∫\( Ç ¬`*`SÍ d`R
+”h,`S+€l. ÇK„p0ÇlÎt0@uçÛxR~≠˚|2Qy ŒÅ4PV!œ
+6 U"( U#0Ö4@V$#â8Dy%,ç U&0ë: T'2<ï<@S(RDô>@P)”Jù.pÇ*sT°q+ì\•@U,¥d©BB}-‘l≠D@R.µt±F`R/ı|µby0Öπ0f}16çΩH`S2Wï¡( P3wù≈JpQ4ó•…0Ç5∏≠ÕL0P6ÿµ—N0V7yπ’Lus8˘≈’FpV9ŒŸP@V:;÷›RPR;[ﬁ·TPR<|ÊÂVQ=úÓÈ`R>ÛÌT?´˛Òw{@¡ˆ*RA·˙X~BœZ PCá˛e}D'/PUE&/sFN7..PRGm?~\PRH0G
+_@TICHﬁX)|JãWa QKXc VL´geU

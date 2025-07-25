@@ -1,0 +1,74 @@
+
+CalendarFields:
+LOAD 
+    SubField('$(vCalendarFields)', ',', IterNo()) AS CalendarFields
+AUTOGENERATE 1 
+WHILE IterNo() <= SubStringCount('$(vCalendarFields)', ',') + 1;
+
+
+FOR EACH i in FieldValueList('CalendarFields')
+
+	SET vCalendarField = $(i);
+    SET vCalendarFieldName = $(i);
+    
+    [Calendar $(vCalendarFieldName)]:
+    LOAD
+    	*
+        //CYTD & PYTD
+    	, If([$(vCalendarFieldName)]>=(YearStart(Today(),0)) AND [$(vCalendarFieldName)] <= Today(), 1, 0) 						as [$(vCalendarFieldName) IsCYTD]
+    	, If([$(vCalendarFieldName)]>=(YearStart(Today(),-1)) AND [$(vCalendarFieldName)] <= Today()-365, 1, 0) 				as [$(vCalendarFieldName) IsPYTD]
+    	, If([$(vCalendarFieldName)]>=(YearStart(Today(),-2)) AND [$(vCalendarFieldName)] <= Today()-730, 1, 0) 				as [$(vCalendarFieldName) IsPPYTD]
+        
+		//CYT12 & PYT12
+        , If([$(vCalendarFieldName)]>=(MonthStart(TODAY(),-12)) AND [$(vCalendarFieldName)] <= MonthEnd(TODAY(),-1), 1, 0) 		as [$(vCalendarFieldName) IsCYT12]
+    	, If([$(vCalendarFieldName)]>=(MonthStart(TODAY(),-24)) AND [$(vCalendarFieldName)] <= MonthEnd(TODAY(),-13), 1, 0) 	as [$(vCalendarFieldName) IsPYT12]
+        
+        //CM & PY
+    	, If([$(vCalendarFieldName)]>=(MonthStart(Today(),0)) AND [$(vCalendarFieldName)] <= Today(), 1, 0) 					as [$(vCalendarFieldName) IsCYCM]
+    	, If([$(vCalendarFieldName)]>=(MonthStart(Today(),-1)) AND [$(vCalendarFieldName)] <= MonthEnd(Today(),-1), 1, 0) 		as [$(vCalendarFieldName) IsCYPM]
+    	, If([$(vCalendarFieldName)]>=(MonthStart(Today(),-12)) AND [$(vCalendarFieldName)] <= Today()-365, 1, 0) 				as [$(vCalendarFieldName) IsPYCM]
+    	, If([$(vCalendarFieldName)]>=(MonthStart(Today(),-13)) AND [$(vCalendarFieldName)] <= MonthEnd(Today(),-1), 1, 0) 		as [$(vCalendarFieldName) IsPYPM]
+//    	, If([$(vCalendarFieldName) Month] = Month(Today()), 1, 0) 															as [$(vCalendarFieldName) IsCM]
+//    	, If([$(vCalendarFieldName) Month] = AddMonths(Today(),-1), 1, 0) 													as [$(vCalendarFieldName) IsPM]
+//    	, If([$(vCalendarFieldName) Month] = AddMonths(Today(),-12), 1, 0) 													as [$(vCalendarFieldName) IsPYM]
+        
+        //CQ & PQ
+    	, IF([$(vCalendarFieldName) Quarter] = ('Q' & ceil(month(TODAY()) / 3)), 1, 0)										as [$(vCalendarFieldName) IsCQ]
+    	, IF([$(vCalendarFieldName) Quarter] = ('Q' & ceil(AddMonths(TODAY(),-1) / 3)), 1, 0)								as [$(vCalendarFieldName) IsPQ]
+    ;
+    LOAD Distinct
+     	TempDate 												as [$(vCalendarField)], 
+    // 	TempDate 												as [$(vCalendarFieldName)], 
+     	week(TempDate) 											as [$(vCalendarFieldName) Week], 
+        WeekEnd(TempDate)										as [$(vCalendarFieldName) WeekEnding],
+     	Month(TempDate) 										as [$(vCalendarFieldName) Month],
+        NUM(Month(TempDate)) 									as [$(vCalendarFieldName) MonthNum],
+        YEAR(TempDate) &'-'& MONTH(TempDate)					as [$(vCalendarFieldName) YearMonth], 
+        Year(TempDate)					  						as [$(vCalendarFieldName) Year], 
+     	Day(TempDate) 											as [$(vCalendarFieldName) Day], 
+     	'Q' & ceil(month(TempDate) / 3) 						as [$(vCalendarFieldName) Quarter], 
+     	Week(weekstart(TempDate)) & '-' & WeekYear(TempDate) 	as [$(vCalendarFieldName) WeekYear], 
+     	WeekDay(TempDate) 										as [$(vCalendarFieldName) WeekDay],
+        //MonthDiff
+		(year(TempDate)*12 + Month(TempDate)) - (year(mindate)*12 + Month(mindate)) as [$(vCalendarFieldName) MonthNumber],
+		(year(TempDate)*12 + Month(TempDate)) - (year(Today())*12 + Month(Today())) as [$(vCalendarFieldName) MonthDiff]
+    ;
+
+    //=== Generate a temp table of dates === 
+    LOAD 
+     	date(mindate + IterNo()) 								AS TempDate
+        , mindate
+     	, maxdate // Used in InYearToDate() above, but not kept 
+    WHILE mindate + IterNo() <= maxdate;
+
+    //=== Get min/max dates from Field ===/
+    LOAD
+     	min(FieldValue('$(vCalendarField)', recno()))-1 		as mindate,
+     	max(FieldValue('$(vCalendarField)', recno())) 			as maxdate
+    AUTOGENERATE FieldValueCount('$(vCalendarField)');
+    
+    SET vCalendarField =;
+
+NEXT i
+
+DROP TABLE [CalendarFields];

@@ -1,0 +1,31 @@
+//Field Tags
+
+FOR i = 1 TO NoOfFields()
+
+    LET vField = FieldName($(i));
+
+    // Tag key fields: contain a %
+    IF WildMatch('$(vField)', '*%*') THEN
+        TAG FIELD [$(vField)] WITH '$key';
+    ENDIF
+
+    // Tag date fields: end with 'Date'
+    IF WildMatch('$(vField)', '*Date') THEN
+        TAG FIELD [$(vField)] WITH '$date', '$axis';
+    ENDIF
+
+    // Tag measures: contain common numeric indicators
+    IF WildMatch('$(vField)', '*Price*', '*Amount*', '*Quantity*', '*Freight*', '*Stock*') THEN
+        TAG FIELD [$(vField)] WITH '$measure';
+    ENDIF
+
+    // Tag dimensions: contain common categorical indicators
+    IF WildMatch('$(vField)', '*Name*', '*Region*', '*Category*', '*Country*', '*City*') THEN
+        TAG FIELD [$(vField)] WITH '$dimension';
+    ENDIF
+
+NEXT i;
+
+
+
+

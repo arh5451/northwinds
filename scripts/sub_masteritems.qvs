@@ -1,0 +1,35 @@
+SUB master_items
+
+    [MasterDimensions]:
+    LOAD
+        DimName,
+        Field,
+        Label,
+        'dim_' & DimName AS [VariableName]
+    RESIDENT Dimensions;
+
+    [MasterMeasures]:
+    LOAD
+        MeasureName,
+        Expression,
+        Label,
+        Format,
+        'meas_' & MeasureName AS [VariableName]
+    RESIDENT Measures;
+
+
+    FOR i = 0 TO NoOfRows('Measures') - 1
+        LET vName = Peek('MeasureName', $(i), 'Measures');
+        LET vExpr = Peek('Expression', $(i), 'Measures');
+        LET vVar  = 'meas_' & vName;
+        SET $(vVar) = $(vExpr);
+    NEXT
+
+    FOR j = 0 TO NoOfRows('Dimensions') - 1
+        LET dName = Peek('DimName', $(j), 'Dimensions');
+        LET dField = Peek('Field', $(j), 'Dimensions');
+        LET dVar  = 'dim_' & dName;
+        SET $(dVar) = [$(dField)];
+    NEXT
+
+end sub

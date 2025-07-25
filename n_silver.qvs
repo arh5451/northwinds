@@ -1,0 +1,268 @@
+/*
+	Transform Script - Silver Layer
+
+	Changelog:
+	- 25.7.25 - First edit, load all extract files
+*/
+
+//Set the bronze source
+SET vBronze = 'lib://main/bronze/';
+
+//1. Rename the tables
+//2. Add keys
+//3. Fix any data issues + any additional transformations
+
+/*
+	Load the tables from Extraction
+	- Make some core logic changes
+	- Add flags
+	- Rename fields
+	- Filter data if needed... (no filter yet applied as of v1.0)
+*/
+
+/*
+	Load Fact Table
+*/
+Orders:
+LOAD
+    //keys
+    OrderID            	as [%OrderID]
+    , CustomerID       	as [%CustomerID]
+    , EmployeeID       	as [%EmployeeID]
+
+	//measures
+    , Interval(RequiredDate - ShippedDate, 'D')
+    					as [#DaysLate]
+
+    //dims
+//    , $(fx_datechange(OrderDate))
+    , OrderDate
+    , RequiredDate
+    , ShippedDate
+    , ShipVia          	as [%ShipperID]
+    , Freight			as [Freight Cost]
+    , ShipName			as [Order ShipName]
+    , ShipAddress      	as [Order ShipAddress]
+    , ShipCity         	as [Order ShipCity]
+    , ShipRegion       	as [Order ShipRegion]
+    , ShipPostalCode   	as [Order ShipPostalCode]
+    , ShipCountry      	as [Order ShipCountry]
+    
+    //flags
+    , IF(IsNull(ShippedDate)
+    	, dual('Open Order',2)
+        , IF(ShippedDate <= RequiredDate
+    		, dual('On-Time',1)
+        	, dual('Late', 0)
+        	)
+         )				as [Order Status]
+//Bad field names, we could in theory eliminate these automatically in the extract layer, but for now manually done here
+//    , F15
+//    , F16
+//    , F17
+;
+LOAD * FROM [lib://main/bronze/Orders$.qvd] (qvd);
+
+OrderDetails:
+LOAD
+    //keys
+    OrderID            as [%OrderID]
+    , ProductID        as [%ProductID]
+
+    //dims
+    , UnitPrice        as [OrderDetail UnitPrice]
+    , Quantity         as [OrderDetail Quantity]
+    , Discount         as [OrderDetail Discount]
+FROM [lib://main/bronze/Orders Details$.qvd] (qvd);
+
+/*
+	Load Dims - Could denormalize
+*/
+Products:
+LOAD
+    //keys
+    ProductID          	as [%ProductID]
+    , SupplierID       	as [%SupplierID]
+
+    //dims
+    , ProductName
+    , CategoryID       	as [Product CategoryID]
+    , QuantityPerUnit
+    , UnitPrice        	as [Product UnitPrice]
+    , UnitsInStock
+    , UnitsOnOrder
+    , ReorderLevel
+    , IF(Discontinued = -1
+    	, dual('discontinued',1)
+        , dual('active',0)
+        )				as [Discontinued]	//Changing this to be 1,0 for consistency
+    
+    //flags
+    , IF(Discontinued = 0
+    	, IF(UnitsOnOrder > UnitsInStock
+    		, dual('stock out',1)
+        	, dual('available to ship',0)
+        	)
+        , NULL()
+        )				as [isStockOut]
+    , IF(Discontinued = 0
+    	, IF(UnitsInStock < ReorderLevel
+    		, dual('reorder required',1)
+        	, dual('stock on hand',0)
+        	)
+        , NULL()
+        )				as [isReOrder]
+;
+LOAD * FROM [lib://main/bronze/Product$.qvd] (qvd);
+
+Customers:
+LOAD
+    //keys
+    CustomerID         	as [%CustomerID]
+    
+    //dims
+    , CompanyName      	as [Customer CompanyName]
+    , ContactName      	as [Customer ContactName]
+    , ContactTitle     	as [Customer ContactTitle]
+    , Address          	as [Customer Address]
+    , City             	as [Customer City]
+    , Region           	as [Customer Region]
+    , PostalCode       	as [Customer PostalCode]
+    , Country          	as [Customer Country]
+    , Phone            	as [Customer Phone]
+    , Fax              	as [Customer Fax]
+    , lat				as [Customer lat]
+    , long				as [Customer long]
+FROM [lib://main/bronze/Customers$.qvd] (qvd);
+
+Employees:
+LOAD
+    //keys
+    EmployeeID         as [%EmployeeID]
+
+    //dims
+    , LastName         as [Employee LastName]
+    , FirstName        as [Employee FirstName]
+    , FirstName & ' ' & LastName as [Employee Name]		//Make Employee Full Name
+    , Title            as [Employee Title]
+    , TitleOfCourtesy  as [Employee TitleOfCourtesy]
+    , BirthDate        as [Employee BirthDate]
+    , HireDate         as [Employee HireDate]
+    , Address          as [Employee Address]
+    , City             as [Employee City]
+    , Region           as [Employee Region]
+    , PostalCode       as [Employee PostalCode]
+    , Country          as [Employee Country]
+    , HomePhone        as [Employee HomePhone]
+    , "Extension"      as [Employee Extension]
+    , Photo            as [Employee Photo]			//don't have the files, so i can't include them
+    , Notes            as [Employee Notes]
+    , ReportsTo        as [Employee ReportsTo]		//Hierarchy
+;
+LOAD * FROM [lib://main/bronze/Employees$.qvd] (qvd);
+
+NOCONCATENATE
+
+[Employees_Hierarchy]:
+Hierarchy (
+      %EmployeeID         			// Node ID
+    , [Employee ReportsTo]          // Parent Node ID
+    , [Employee Name]    			// Node Name [field]
+    , Manager						// Parent Name - string
+    , 								// Parent Source
+    , ReportingStructure 			// Path Name - string
+    , '/'                			// Delimiter
+    , EmployeeLevel              	// Optional: Level depth - string
+)
+LOAD * RESIDENT Employees;
+
+drop table Employees;
+rename table Employees_Hierarchy to Employees;
+
+/*
+	Dimensions - never would denormalize
+*/
+
+Suppliers:
+LOAD
+    //keys
+    SupplierID         as [%SupplierID]
+
+    //dims
+    , CompanyName      as [Supplier CompanyName]
+    , ContactName      as [Supplier ContactName]
+    , ContactTitle     as [Supplier ContactTitle]
+    , Address          as [Supplier Address]
+    , City             as [Supplier City]
+    , Region           as [Supplier Region]
+    , PostalCode       as [Supplier PostalCode]
+    , Country          as [Supplier Country]
+    , Phone            as [Supplier Phone]
+    , Fax              as [Supplier Fax]
+    , HomePage         as [Supplier HomePage]
+FROM [lib://main/bronze/Suppliers$.qvd] (qvd);
+
+
+// This can be mapped, but not necessary atm
+Shippers:
+LOAD
+    //keys
+    ShipperID          as [%ShipperID]
+
+    //dims
+    , CompanyName      as [Shipper CompanyName]
+    , Phone            as [Shipper Phone]
+FROM [lib://main/bronze/Shippers$.qvd] (qvd);
+
+// === Fixing the Date ===
+// This script is to make the date look more recent. We shift all the days by the same interval using one date as the "interval base" point
+
+//Messing with the dates to make them present day-ish
+LET vFakeDate = MakeDate(2024, 07, 25);
+
+TempMinDate:
+LOAD Min(OrderDate) AS MinOrderDate
+RESIDENT Orders;
+
+LET vBaseDate = Peek('MinOrderDate', 0, 'TempMinDate');
+DROP TABLE TempMinDate;
+
+LET vDateOffset = vFakeDate - vBaseDate;
+
+DateFieldsToShift:
+LOAD * INLINE [
+TableName, FieldName
+Orders, OrderDate
+Orders, ShippedDate
+Orders, RequiredDate
+Employees, Employee HireDate
+Employees, Employee BirthDate
+];
+
+FOR i = 0 TO NoOfRows('DateFieldsToShift') - 1
+
+    LET vTableName  = Peek('TableName',  $(i), 'DateFieldsToShift');
+    LET vFieldName  = Peek('FieldName',  $(i), 'DateFieldsToShift');
+    LET vNewField   = 'Shifted_' & '$(vFieldName)';
+
+    // Create temp shifted field table
+    NoConcatenate
+    tmp_$(vTableName):
+    LOAD
+        *
+        , Date([$(vFieldName)] + $(vDateOffset)) AS [$(vNewField)]
+    RESIDENT [$(vTableName)];
+
+	DROP TABLE [$(vTableName)];
+    RENAME TABLE [tmp_$(vTableName)] TO [$(vTableName)];
+    
+    DROP FIELD [$(vFieldName)];
+    RENAME FIELD [$(vNewField)] TO [$(vFieldName)];
+
+NEXT
+
+DROP TABLE DateFieldsToShift;
+
+
+// === EXPORT QVDs===
+//Exporting the QVDs via the sub function
