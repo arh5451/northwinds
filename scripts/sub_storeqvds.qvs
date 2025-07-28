@@ -1,4 +1,4 @@
-SUB storeqvds
+SUB storeqvds(folderlocation)
 
     FOR i = 0 to NoOfTables()-1
 

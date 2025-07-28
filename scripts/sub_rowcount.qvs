@@ -1,7 +1,17 @@
 // RowCount.qvs
-SUB rcount
+SUB rcount(vTableName)
 
-    LET vRowCount = NoOfRows('$(i)');
+    LET vRowCount = NoOfRows('$(vTableName)');
  //   LET vRowCount = NoOfRows('$(tableName)');
-    TRACE Table $(tableName) has $(vRowCount) rows loaded;
+    TRACE Table $(vTableName) has $(vRowCount) rows loaded;
+    
 END SUB
+
+
+/*
+    // RowCount.qvs
+    SUB rcount(tablename)
+        LET vRowCount = NoOfRows('$(tablename)');
+        TRACE Table $(tablename) has $(vRowCount) rows loaded;
+    END SUB
+*/

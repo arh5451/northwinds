@@ -5,6 +5,13 @@
 	- 25.7.25 - First edit, initial load of xls data
 */
 
+//Load subscripts
+Load the sub functions
+FOR EACH vFile in FileList('lib://main/scripts/sub*.qvs')
+    TRACE Loading $(vFile) script;
+    $(Must_Include=$(vFile));
+NEXT vFile
+
 //Flat file extraction location
 SET vNorthwindUnclean = 'lib://main/Qlik Northwind_Uncleaned.xls';
 
@@ -45,22 +52,22 @@ FOR EACH i in FieldValueList('TableNames')
     //WHERE YEAR(VFDAT) > $(vMinDate) - not in use ignore this
     ;
 
-    Call rcount;
+    Call rcount('$(i)');
 
-    [MetaDataTable]
+    [MetaDataTable]:
     LOAD
-      $(i)
-    , $(vRowCount)
-    AUTOGENERATE (1)
-    ;
+      '$(i)'              as [TableName]
+      , $(vRowCount)      as [RowCount]
+    AUTOGENERATE (1);
 
-    STORE * FROM [$(i)] INTO [lib://main/bronze/$(i).qvd] (qvd)
-    ;
+    STORE * FROM [$(i)] INTO [lib://main/bronze/$(i).qvd] (qvd);
 
     DROP TABLE [$(i)];
 
 
 NEXT i
+
+STORE MetaDataTable INTO [lib://main/metadata/bronze_MetaDataTable.qvd] (qvd);
 
 //Drop Extract Tables List
 //DROP TABLE ExtractTablesList;

@@ -9,27 +9,28 @@
 //Load the data model
 LOAD
 *
-FROM [lib://main/gold/*.qvd]
+FROM [lib://main/silver/*.qvd]
 (qvd);
 
 // //Meta Data Driven - Measure & Dimensions
-// [Dimensions]:
-// LOAD * INLINE [
-// DimName, Field, Label
-// Customer, CustomerName, Customer
-// Product, ProductName, Product
-// Region, Region, Region
-// OrderDate, OrderDate, Order Date
-// ];
+[Dimensions]:
+LOAD * INLINE [
+DimName, Field, Label
+Customer, CustomerName, Customer
+Product, ProductName, Product
+Region, Region, Region
+OrderDate, OrderDate, Order Date
+];
 
 
-// [Measures]:
-// LOAD * INLINE [
-// MeasureName, Expression, Label, Format
-// Sales, Sum(SalesAmount), Total Sales, #,##0.00
-// Quantity, Sum(Quantity), Units Sold, #,##0
-// Margin, Sum(Margin), Profit Margin, #,##0.00
-// ];
+// Inline control table for measures
+Measures:
+LOAD * INLINE [
+    MeasureName,       Expression,          Label,         Format,     ColorMapping
+    Sales,             Sum(SalesAmount),    Total Sales,   #,##0.00,   Green()
+    Quantity,          Sum(Quantity),       Units Sold,    #,##0,      Blue()
+    Margin,            Sum(Margin),         Profit Margin, #,##0.00,   Red()
+];
 
 // Call sub_masteritems;
 
