@@ -5,12 +5,25 @@
 	- 25.7.25 - First edit, load all extract files
 */
 
+//Load subscripts
+$(Must_Include=lib://main/scripts/subs.qvs);
+
 //Set the bronze source
 SET vBronze = 'lib://main/bronze/';
 
 //1. Rename the tables
 //2. Add keys
 //3. Fix any data issues + any additional transformations
+
+//Temp table to format things nicely... will be dropped before exit
+Formatting:
+LOAD					
+      Date(0) as OrderDate   
+    , Date(0) as RequiredDate  
+    , Date(0) as ShippedDate  
+    , Date(0) as BirthDate  
+    , Date(0) as HireDate
+Autogenerate(0);
 
 /*
 	Load the tables from Extraction
@@ -31,7 +44,10 @@ LOAD
     , EmployeeID       	as [%EmployeeID]
 
 	//measures
-    , Interval(RequiredDate - ShippedDate, 'D')
+    , IF(Interval(ShippedDate - RequiredDate, 'D') > 0
+        , Interval(ShippedDate - RequiredDate, 'D')
+        , 0
+    )
     					as [#DaysLate]
 
     //dims
@@ -86,7 +102,7 @@ LOAD
 
     //dims
     , ProductName
-    , CategoryID       	as [Product CategoryID]
+    , CategoryID       	as [%CategoryID]
     , QuantityPerUnit
     , UnitPrice        	as [Product UnitPrice]
     , UnitsInStock
@@ -98,14 +114,14 @@ LOAD
         )				as [Discontinued]	//Changing this to be 1,0 for consistency
     
     //flags
-    , IF(Discontinued = 0
+    , IF(Discontinued = 0 //AND ShippedDate>TODAY()
     	, IF(UnitsOnOrder > UnitsInStock
     		, dual('stock out',1)
         	, dual('available to ship',0)
         	)
         , NULL()
-        )				as [isStockOut]
-    , IF(Discontinued = 0
+        )				as [isStockOut]     
+    , IF(Discontinued = 0 //AND ShippedDate>TODAY()
     	, IF(UnitsInStock < ReorderLevel
     		, dual('reorder required',1)
         	, dual('stock on hand',0)
@@ -214,12 +230,26 @@ LOAD
     , Phone            as [Shipper Phone]
 FROM [lib://main/bronze/Shippers$.qvd] (qvd);
 
+
+// This can be mapped, but not necessary atm
+Categories:
+LOAD
+    //keys
+    CategoryID          as [%CategoryID]
+
+    //dims
+    , CategoryName      as [Category Name]
+    , Description       as [Description]
+    , Picture           as [Picture]
+FROM [lib://main/bronze/Categories$.qvd] (qvd);
+
 // === Fixing the Date ===
 // This script is to make the date look more recent. We shift all the days by the same interval using one date as the "interval base" point
 
 //Messing with the dates to make them present day-ish
-LET vFakeDate = MakeDate(2024, 07, 25);
+LET vFakeDate = MakeDate(2024, 01, 01);
 
+NoConcatenate
 TempMinDate:
 LOAD Min(OrderDate) AS MinOrderDate
 RESIDENT Orders;
@@ -262,7 +292,48 @@ FOR i = 0 TO NoOfRows('DateFieldsToShift') - 1
 NEXT
 
 DROP TABLE DateFieldsToShift;
+DROP TABLE Formatting;
 
 
 // === EXPORT QVDs===
+//Creating Meta Data & Storing QVDs
+//Loop Through List of tables and store as QVD with no changes.
+
+
+//Get the number of tables in silver
+LET vNoTables = NoOfTables();
+TRACE >> There are $(vNoTables) tables;
+
+//Load the metadata table so we can add new meta-data (we won't loop through it because it will be the table number +1)
+[MetaDataTable]:
+LOAD * FROM [lib://main/metadata/MetaDataTable.qvd] (qvd);
+
+for i = $(vNoTables) - 1 to 0 step - 1
+
+    LET vTableName = TableName($(i));
+
+    TRACE >> Processing table: $(vTableName);
+
+    Call rcount('$(vTableName)');
+
+    [MetaDataTable]:
+    LOAD
+      '$(vTableName)'     as [TableName]
+      , $(vRowCount)      as [RowCount]
+      , 'silver'          as [Layer]
+    AUTOGENERATE (1);
+
+    // Store the table and drop it
+    STORE [$(vTableName)] INTO [lib://main/silver/$(vTableName).qvd] (qvd);
+    DROP TABLE [$(vTableName)];
+
+NEXT
+
+LET i =;
+LET vTableName =;
+
+STORE MetaDataTable INTO [lib://main/metadata/MetaDataTable.qvd] (qvd);
+
+// === EXPORT QVDs===
 //Exporting the QVDs via the sub function
+//CALL storeqvds('silver');

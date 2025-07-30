@@ -6,14 +6,10 @@
 */
 
 //Load subscripts
-Load the sub functions
-FOR EACH vFile in FileList('lib://main/scripts/sub*.qvs')
-    TRACE Loading $(vFile) script;
-    $(Must_Include=$(vFile));
-NEXT vFile
+$(Must_Include=lib://main/scripts/subs.qvs);
 
 //Flat file extraction location
-SET vNorthwindUnclean = 'lib://main/Qlik Northwind_Uncleaned.xls';
+SET vNorthwindUnclean = 'lib://main/rawdata/Qlik Northwind_Uncleaned.xls';
 
 //SQL or othe SAP source
 SET vSQL = '';
@@ -37,8 +33,8 @@ Suppliers$
 ]
 ;
 
-//Set a cutoff date to start the extract from.
-SET vMinDate = 2018;
+//Set a cutoff date to start the extract from. - not used in this app
+// SET vMinDate = 2018;
 
 //Loop Through List of tables and store as QVD with no changes.
 FOR EACH i in FieldValueList('TableNames')
@@ -49,8 +45,9 @@ FOR EACH i in FieldValueList('TableNames')
         *
     FROM [$(vExtractSource)]
     (biff, embedded labels, table is [$(i)]);
-    //WHERE YEAR(VFDAT) > $(vMinDate) - not in use ignore this
-    ;
+    //WHERE YEAR(___) > $(vMinDate) - not in use ignore this
+
+    TRACE $(i);
 
     Call rcount('$(i)');
 
@@ -58,16 +55,14 @@ FOR EACH i in FieldValueList('TableNames')
     LOAD
       '$(i)'              as [TableName]
       , $(vRowCount)      as [RowCount]
+      , 'bronze'          as [Layer]
     AUTOGENERATE (1);
 
-    STORE * FROM [$(i)] INTO [lib://main/bronze/$(i).qvd] (qvd);
+    STORE [$(i)] INTO [lib://main/bronze/$(i).qvd] (qvd);
 
     DROP TABLE [$(i)];
 
 
 NEXT i
 
-STORE MetaDataTable INTO [lib://main/metadata/bronze_MetaDataTable.qvd] (qvd);
-
-//Drop Extract Tables List
-//DROP TABLE ExtractTablesList;
+STORE MetaDataTable INTO [lib://main/metadata/MetaDataTable.qvd] (qvd);

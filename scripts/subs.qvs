@@ -1,0 +1,79 @@
+//Row Count
+SUB rcount(vTableName)
+
+    LET vRowCount = NoOfRows('$(vTableName)');
+ //   LET vRowCount = NoOfRows('$(tableName)');
+    TRACE Table $(vTableName) has $(vRowCount) rows loaded;
+    
+END SUB
+
+//Load Files
+// SUB loadfiles(vFolder)
+//     FOR EACH vFile in FileList('lib://$(vFolder)/*')
+//         TRACE Checking script: $(vFile);
+
+//         IF not IsNull(QvdCreateTime('$(vFile)')) THEN
+//             TRACE Including: $(vFile);
+//             $(Must_Include=$(vFile));
+//         ELSE
+//             TRACE File $(vFile) does not exist or is inaccessible;
+//         ENDIF
+
+//     SET vFile = ;
+
+//     NEXT
+// END SUB
+
+//Store QVDs
+SUB storeqvds(vFolderLocation)
+
+    FOR i = 0 TO NoOfTables() - 1
+
+        LET vTableName = TableName($(i));
+
+        TRACE >> Storing table: $(vTableName) into lib://main/$(vFolderLocation)/$(vTableName).qvd;
+
+        STORE [$(vTableName)] INTO [lib://main/$(vFolderLocation)/$(vTableName).qvd] (qvd);
+
+        DROP TABLE [$(vTableName)];
+
+    NEXT i
+
+END SUB
+
+//Master Items Sub -- probably doesn't need to be a sub
+SUB master_items
+
+    [MasterDimensions]:
+    LOAD
+        DimName,
+        Field,
+        Label,
+        'dim_' & DimName AS [VariableName]
+    RESIDENT Dimensions;
+
+    [MasterMeasures]:
+    LOAD
+        MeasureName,
+        Expression,
+        Label,
+        Format,
+        'meas_' & MeasureName AS [VariableName]
+    RESIDENT Measures;
+
+
+    FOR i = 0 TO NoOfRows('Measures') - 1
+        LET vName = Peek('MeasureName', $(i), 'Measures');
+        LET vExpr = Peek('Expression', $(i), 'Measures');
+        LET vVar  = 'meas_' & vName;
+        SET $(vVar) = $(vExpr);
+    NEXT
+
+    FOR j = 0 TO NoOfRows('Dimensions') - 1
+        LET dName = Peek('DimName', $(j), 'Dimensions');
+        LET dField = Peek('Field', $(j), 'Dimensions');
+        LET dVar  = 'dim_' & dName;
+        SET $(dVar) = [$(dField)];
+    NEXT
+
+END SUB

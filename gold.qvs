@@ -1,0 +1,115 @@
+/*
+	Load Script
+
+	Changelog:
+	- 25.7.25 - First edit, load all of transform files, create measures & dimensions, add default calendar
+*/
+
+//Load the data model
+LOAD
+*
+FROM [lib://main/silver/*.qvd]
+(qvd);
+
+// //Meta Data Driven - Measure & Dimensions
+// [Dimensions]:
+// LOAD * INLINE [
+// DimName, Field, Label
+// Customer, CustomerName, Customer
+// Product, ProductName, Product
+// Region, Region, Region
+// OrderDate, OrderDate, Order Date
+// ];
+
+//Money Formatting
+SET vMoney =
+    if($1>1E6
+        , num($1/1E6,'$#,##0.000M')
+        ,if($1>1E3
+            , num($1/1E3,'$#,##0.000K')
+            ,num($1,'$#,##0')
+        )
+    );
+
+// Inline control table for measures
+Measures:
+LOAD * INLINE [
+MeasureName   | Expression                                                                                   | Label               | Format   | ColorMapping
+Sales         | Sum({$1} OrderDetail.UnitPrice * OrderDetail.Quantity * (1 - OrderDetail.Discount))          | Total Sales         | #,##0.00 | Green()
+Quantity      | Sum({$1} OrderDetail.Quantity)                                                               | Units Sold          | #,##0    | Blue()
+Margin        | Sum({$1} Margin)                                                                             | Profit Margin       | #,##0.00 | Red()
+AvgOrderValue | Sum({$1} OrderDetail.UnitPrice * OrderDetail.Quantity * (1 - OrderDetail.Discount)) / Count({$1} DISTINCT OrderID)     | Average Order Value | #,##0.00 | DarkGreen()
+SalesPerCust  | Sum({$1} OrderDetail.UnitPrice * OrderDetail.Quantity * (1 - OrderDetail.Discount)) / Count({$1} DISTINCT CustomerID)  | Sales per Customer  | #,##0.00 | Purple()
+NewCustRev    | Sum({<IsNewCustomer={1}, $1>} OrderDetail.UnitPrice * OrderDetail.Quantity * (1 - OrderDetail.Discount)) | New Customer Revenue | #,##0.00 | Orange()
+]
+(txt, delimiter is '|');
+
+SetAnalysis:
+LOAD * INLINE [
+SetName   | SetExpression
+YTD       | <OrderDate={"=IsCYTD = 1"}>
+PYTD      | <OrderDate={"=IsPYTD = 1"}>
+MTD       | <OrderDate={"=IsCYCM = 1"}>
+PMTD      | <OrderDate={"=IsPYCM = 1"}>
+YTD12     | <OrderDate={"=IsCYT12 = 1"}>
+PYTD12    | <OrderDate={"=IsPYT12 = 1"}>
+ALL       |
+]
+(txt, delimiter is '|');
+
+// Temporary tables to iterate
+NoConcatenate
+TempMeasures:
+LOAD RowNo() AS MeasureRow, MeasureName, Expression RESIDENT Measures;
+
+NoConcatenate
+TempSets:
+LOAD RowNo() AS SetRow, SetName, SetExpression RESIDENT SetAnalysis;
+
+// Get counts for loops
+LET vMeasureCount = NoOfRows('TempMeasures');
+LET vSetCount = NoOfRows('TempSets');
+
+// Loop through all measures
+FOR i = 1 TO $(vMeasureCount)
+
+    LET  = Peek('MeasureName', $(i)-1, 'TempMeasures');
+    LET vExpressionTemplate = Peek('Expression', $(i)-1, 'TempMeasures');
+
+    // Loop through all set variants
+    FOR j = 1 TO $(vSetCount)
+
+        LET vSetName = Peek('SetName', $(j)-1, 'TempSets');
+        LET vSetExpr = Peek('SetExpression', $(j)-1, 'TempSets');
+
+        // Define variable name
+        LET vVarName = 'v' & $(vMeasureName) & IF(Len(Trim($(vSetName))) > 0, '_' & $(vSetName), '');
+
+        // Replace $1 with actual set expression (or blank)
+        LET [$(vVarName)] = Replace('$(vExpressionTemplate)', '$1', '$(vSetExpr)');
+
+    NEXT j
+
+NEXT i
+
+// Drop temp tables
+DROP TABLE TempMeasures;
+DROP TABLE TempSets;
+
+
+
+
+
+// Drop Measures table if not needed after
+DROP TABLE Measures;
+
+//Calendar
+//set the calendar fields you want to make calendars for...
+
+SET vCalendarFields = 'OrderDate,RequiredDate,ShippedDate,[Employee BirthDate],[Employee HireDate]';
+
+//Make the calendars automatically
+$(Include=lib://main/scripts/calendarscript.qvs);
+
+// Auto tag fields after load
+$(include=lib://main/scripts/tags.qvs);

@@ -1,30 +1,37 @@
-//Field Tags
+// Loop through all loaded tables
+FOR iTable = 0 TO NoOfTables() - 1
 
-FOR i = 1 TO NoOfFields()
+    LET vTableName = TableName($(iTable));
 
-    LET vField = FieldName($(i));
+    // Loop through all fields in the current table
+    FOR iField = 1 TO NoOfFields('$(vTableName)')
 
-    // Tag key fields: contain a %
-    IF WildMatch('$(vField)', '*%*') THEN
-        TAG FIELD [$(vField)] WITH '$key';
-    ENDIF
+        LET vFieldName = FieldName($(iField), '$(vTableName)');
 
-    // Tag date fields: end with 'Date'
-    IF WildMatch('$(vField)', '*Date') THEN
-        TAG FIELD [$(vField)] WITH '$date', '$axis';
-    ENDIF
+        // Tag key fields: contain a %
+        IF WildMatch('$(vFieldName)', '*%*') THEN
+            TAG FIELD [$(vFieldName)] WITH '$key';
+        ENDIF
 
-    // Tag measures: contain common numeric indicators
-    IF WildMatch('$(vField)', '*Price*', '*Amount*', '*Quantity*', '*Freight*', '*Stock*') THEN
-        TAG FIELD [$(vField)] WITH '$measure';
-    ENDIF
+        // Tag date fields: end with 'Date'
+        IF WildMatch('$(vFieldName)', '*Date') THEN
+            TAG FIELD [$(vFieldName)] WITH '$date', '$axis';
+        ENDIF
 
-    // Tag dimensions: contain common categorical indicators
-    IF WildMatch('$(vField)', '*Name*', '*Region*', '*Category*', '*Country*', '*City*') THEN
-        TAG FIELD [$(vField)] WITH '$dimension';
-    ENDIF
+        // Tag measures: contain common numeric indicators
+        IF WildMatch('$(vFieldName)', '*Price*', '*Amount*', '*Quantity*', '*Freight*', '*Stock*') THEN
+            TAG FIELD [$(vFieldName)] WITH '$measure';
+        ENDIF
 
-NEXT i;
+        // Tag dimensions: contain common categorical indicators
+        IF WildMatch('$(vFieldName)', '*Name*', '*Region*', '*Category*', '*Country*', '*City*') THEN
+            TAG FIELD [$(vFieldName)] WITH '$dimension';
+        ENDIF
+
+    NEXT iField
+
+NEXT iTable
+
 
 
 
